@@ -32,7 +32,7 @@ bottom_sick = dataframe.nsmallest(5, dataframe.columns[1]).iloc[:, [0, 1]]
 bottom_heal = dataframe.nsmallest(5, dataframe.columns[2]).iloc[:, [0, 2]]
 bottom_dead = dataframe.nsmallest(5, dataframe.columns[3]).iloc[:, [0, 3]]
 
-fig, axes = plt.subplots(1, 6, figsize=(12, 6))  # 6.визуализация - несколько диаграмм в одном окне
+fig, axes = plt.subplots(6, 1, figsize=(12, 6))  # 6.визуализация - несколько диаграмм в одном окне
 top_sick.plot.barh(x=0, y=1, color='red', ax=axes[0])  # 6.визуализация - отрисовка столбчатой диаграммы
 top_heal.plot.barh(x=0, y=1, color='green', ax=axes[1])
 top_dead.plot.barh(x=0, y=1, color='black', ax=axes[2])
