@@ -23,7 +23,6 @@ class DirectoryEventHandler(FileSystemEventHandler):
 
 def start_observer(path):
     global observer, event_handler
-    print(f"{datetime.datetime.now()}: Started watching {path}")
     callback(f"{datetime.datetime.now()}: Started watching {path}")
     observer.schedule(event_handler, path, recursive=True)
     observer.start()
@@ -65,7 +64,6 @@ if __name__ == "__main__":
     # объявление элементов интерфейса
     root = tk.Tk()  # главное окно
     root.title("Folder watcher")  # его заголовок
-    sv = tk.StringVar()  # текст для  текстбокса
     button_choose_dir = ttk.Button(root, text='Choose a folder', command=choose_dir)  # кнопка выбора директории
     button_exit = ttk.Button(root, text='Exit', command=exit)  # кнопка выхода
     sctext_log = scrolledtext.ScrolledText(root, height=20, width=40, font=("Times New Roman", 12))  # окно журнала
