@@ -34,10 +34,7 @@ def stop_observer():
     observer.join()
 
 
-def callback(message): # функция обратного вызова
-                       # на самом деле это никакая непередача исполняемого кода
-                       # в качестве одного из параметров другого кода,
-                       # просто пропихиваем результат работы обработчика в текстовое поле гуйни
+def callback(message): #пропихивает сообщение от хендлера в гуи
     global sctext_log
     sctext_log.configure(state='normal')
     sctext_log.insert('end', message+'\n')
@@ -77,4 +74,4 @@ if __name__ == "__main__":
     button_exit.grid(row=1, column=1, pady=10, padx=10, sticky='es')
     sctext_log.grid(row=0, columnspan=2, pady=10, padx=10, sticky='nesw')
 
-    root.mainloop()  # запускаем работу основного потока программы - костыльный цикл боьше не нужен
+    root.mainloop()  # запускаем работу основного потока программы - костыльный цикл больше не нужен
