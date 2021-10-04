@@ -20,7 +20,6 @@
 [skimage](https://scikit-image.org/docs/dev/)  
 [flask](https://flask.palletsprojects.com/en/1.1.x/)  
 [jinja](https://jinja.palletsprojects.com/en/2.11.x/)  
-[skimage](https://scikit-image.org/)  
 [tkinter](https://docs.python.org/3/library/tkinter.html)   
 [watchdog](https://pypi.org/project/watchdog/)  
 [pyQt5](https://www.riverbankcomputing.com/static/Docs/PyQt5/) 
