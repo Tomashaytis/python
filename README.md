@@ -27,7 +27,7 @@
 4.2. В качестве `head repository` указывается ваш форкнутый репозиторий, в качестве `compare` - ветка, в которой вы работали в своем репозитории;  
 4.3. Название пул риквеста *должно* формироваться следующим образом: `<Номер группы> <ФИО> Лаб.<Номер лабы> Вар.<Номер варианта>`;  
 4.4. В описание пул риквеста было бы неплохо добавить описание того, что  от вас требовалось сделать в данной лабораторной согласно вашему варианту. Хотя бы на русском языке;  
-4.5. Поставить преподавателя (то есть меня) в [ревьюеры](https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/proposing-changes-to-your-work-with-pull-requests/requesting-a-pull-request-review) и запросить код ревью;
+4.5. Поставить преподавателя (то есть меня) в [ревьюеры](https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/proposing-changes-to-your-work-with-pull-requests/requesting-a-pull-request-review) и запросить код ревью;  
 4.6. Поставить себя в [исполнители](https://docs.github.com/en/issues/tracking-your-work-with-issues/assigning-issues-and-pull-requests-to-other-github-users);
 
 
