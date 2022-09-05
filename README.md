@@ -4,7 +4,9 @@
 [Лабораторная 1](https://github.com/itsecd/python/tree/master/Lab1) - Работа с регулярными выражениями;  
 [Лабораторная 2](https://github.com/itsecd/python/tree/master/Lab2) - Работа с файлами записей. Валидация;  
 [Лабораторная 3](https://github.com/itsecd/python/tree/master/Lab3) - Сериализация данных;  
-[Лабораторная 4](https://github.com/itsecd/python/tree/master/Lab4) - Анализ табличных данных, визуализация графиков, многопоточность.  
+[Лабораторная 4](https://github.com/itsecd/python/tree/master/Lab4) - Анализ табличных данных, визуализация графиков, многопоточность.
+
+Текущая успеваемость доступна [здесь](https://docs.google.com/spreadsheets/d/1-T5bN60sduQSYTlml_Gg0qIEoQLg-EZVz1_b6QNdtjE/edit?usp=sharing).
 
 \* Так как курс относительно свежий, не исключено, что в течение семестра задания некоторых лабораторных работ могут измениться.
 
