@@ -5,8 +5,22 @@ from bs4 import BeautifulSoup
 import cv2
 from fake_useragent import UserAgent
 
+
+def download_picture(direct, img_id, img_address):
+    filename = 'dataset/' + direct + '/' + '0' * (4 - len(str(img_id))) + str(img_id) + '.jpg'
+    image = requests.get(img_address)
+    print(image)
+    direct = open(filename, 'wb')
+    direct.write(image.content)
+    direct.close()
+
+
+# os.mkdir('dataset')
+# os.mkdir('dataset/tiger')
+# os.mkdir('dataset/leopard')
 URL = 'https://yandex.ru/images/search?text=animal,tiger'
 headers = {"User-Agent": UserAgent().chrome}
+# download_picture('tiger', 0, 'https://www.fonstola.ru/images/201509/fonstola.ru_202497.jpg')
 images = []
 max_pages = 10
 for page in range(1, max_pages + 1):
@@ -28,7 +42,15 @@ print(len(images))
 # os.mkdir('dataset/leopard')
 # cv2.imwrite('python/dataset/tiger', img[0])
 # за каждую итерацию загружается > 100 фотографий
-'''img = []
+'''
+filename = 'dataset/tiger/0000.jpg'
+image = requests.get('https://www.fonstola.ru/images/201509/fonstola.ru_202497.jpg')
+print(image)
+directory = open(filename, 'wb')
+directory.write(image.content)
+directory.close()
+
+img = []
 max_pages = 9
 for i in range(max_pages):
     a = re.findall(r'"origin":\{"w":\w+,"h":\w+,"url":"([^"]+)"\}', html_page.text)
