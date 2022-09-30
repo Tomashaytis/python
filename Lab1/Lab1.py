@@ -15,7 +15,7 @@ def download_picture(directory, img_id, img_address):
     """
     filename = f'{directory}/{str(img_id).rjust(4, "0")}.jpg'
     picture = requests.get(f'https:{img_address}', HEADERS)
-    if picture.status_code:
+    if picture.status_code == 200:
         direct = open(filename, 'wb')
         direct.write(picture.content)
         direct.close()
@@ -36,7 +36,7 @@ def directory_manager(directory):
             os.makedirs(directory)
             break
         except OSError:
-            os.removedirs(directory)
+            return
 
 
 def download_quantity_of_photos(search_name, quantity, directory):
@@ -48,33 +48,51 @@ def download_quantity_of_photos(search_name, quantity, directory):
     :param search_name: поисковый запрос.
     :param quantity: количество соответствующих запросу картинок, подлежащих скачиванию.
     :param directory: путь к директории, куда будут скачиваться картинки.
-    :return: Нет возвращаемого значения.
+    :return: Успешно или неуспешно прошла операция загрузки.
     """
     url = 'https://yandex.ru/images/'
+    checker = 0
     images = []
     page = 0
+    no_repeat = 0
+    repeaters = 0
     while len(images) <= quantity:
-        html_page = requests.get(f'{url}search?p={page}&text={search_name}&lr=51&rpt=image', HEADERS).text
+        html_page = requests.get(f'{url}search?p={page}&text={search_name}&lr=51&rpt=image', HEADERS)
+        if html_page.status_code != 200:
+            print('Ошибка: Запрос не удался')
+            return False
+        if checker > 15:
+            print('Ошибка: Запрос не удался')
+            return False
+        html_page = html_page.text
         soup = BeautifulSoup(html_page, 'lxml')
         page_img = soup.find_all('img')
         for image in page_img:
             if len(image['src']) and image['src'][0] == '/':
-                images.append(image['src'])
-                print(len(images))
+                if no_repeat == 30:
+                    no_repeat = 0
+                    repeaters = 13
+                if repeaters == 0:
+                    images.append(image['src'])
+                    no_repeat += 1
+                    print(len(images))
+                else:
+                    repeaters -= 1
+                checker = 0
+        checker += 1
         page += 1
     for i in range(len(images)):
         if not download_picture(directory, i, images[i]):
             print(f'Ошибка загрузки изображения. Его id: {i}')
+        else:
+            print(i)
     del images
+    return True
 
-
-HEADERS = {"User-Agent": "Mozilla/5.0"}
-directory_manager('dataset/tiger')
-directory_manager('dataset/leopard')
-download_quantity_of_photos('tiger', 1100, 'dataset/tiger')
-download_quantity_of_photos('leopard', 1100, 'dataset/leopard')
 
 if __name__ == '__main__':
-    directory_manager()
-    download_picture()
-    download_quantity_of_photos()
+    HEADERS = {"User-Agent": "Mozilla/5.0"}
+    directory_manager('dataset/tiger')
+    directory_manager('dataset/leopard')
+    download_quantity_of_photos('tiger', 1100, 'dataset/tiger')
+    download_quantity_of_photos('leopard', 1100, 'dataset/leopard')
