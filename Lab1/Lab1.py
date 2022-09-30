@@ -1,6 +1,9 @@
 import os
 import requests
 from bs4 import BeautifulSoup
+import logging
+from tqdm import tqdm
+HEADERS = {"User-Agent": "Mozilla/5.0"}
 
 
 def download_picture(directory, img_id, img_address):
@@ -31,12 +34,10 @@ def directory_manager(directory):
     :param directory: имя новой директории (может содержать и промежуточные директории).
     :return: Нет возвращаемого значения.
     """
-    while True:
-        try:
-            os.makedirs(directory)
-            break
-        except OSError:
-            return
+    try:
+        os.makedirs(directory)
+    except OSError:
+        return
 
 
 def download_quantity_of_photos(search_name, quantity, directory):
@@ -48,7 +49,7 @@ def download_quantity_of_photos(search_name, quantity, directory):
     :param search_name: поисковый запрос.
     :param quantity: количество соответствующих запросу картинок, подлежащих скачиванию.
     :param directory: путь к директории, куда будут скачиваться картинки.
-    :return: Успешно или неуспешно прошла операция загрузки.
+    :return: Нет возвращаемого значения.
     """
     url = 'https://yandex.ru/images/'
     checker = 0
@@ -56,14 +57,15 @@ def download_quantity_of_photos(search_name, quantity, directory):
     page = 0
     no_repeat = 0
     repeaters = 0
+    bar = tqdm(total=quantity)
     while len(images) <= quantity:
         html_page = requests.get(f'{url}search?p={page}&text={search_name}&lr=51&rpt=image', HEADERS)
         if html_page.status_code != 200:
             print('Ошибка: Запрос не удался')
-            return False
+            return
         if checker > 15:
             print('Ошибка: Запрос не удался')
-            return False
+            return
         html_page = html_page.text
         soup = BeautifulSoup(html_page, 'lxml')
         page_img = soup.find_all('img')
@@ -75,23 +77,20 @@ def download_quantity_of_photos(search_name, quantity, directory):
                 if repeaters == 0:
                     images.append(image['src'])
                     no_repeat += 1
-                    print(len(images))
+                    bar.update(1)
                 else:
                     repeaters -= 1
                 checker = 0
         checker += 1
         page += 1
-    for i in range(len(images)):
+    del bar
+    for i in tqdm(range(len(images))):
         if not download_picture(directory, i, images[i]):
             print(f'Ошибка загрузки изображения. Его id: {i}')
-        else:
-            print(i)
     del images
-    return True
 
 
 if __name__ == '__main__':
-    HEADERS = {"User-Agent": "Mozilla/5.0"}
     directory_manager('dataset/tiger')
     directory_manager('dataset/leopard')
     download_quantity_of_photos('tiger', 1100, 'dataset/tiger')
