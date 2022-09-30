@@ -6,18 +6,16 @@ from tqdm import tqdm
 HEADERS = {"User-Agent": "Mozilla/5.0"}
 
 
-def download_picture(directory, img_id, img_address):
+def download_picture(filename, img_address):
     """
     Качает картинку и сохраняет её в выбранную директорию.
     Имя скаченной картинки формируется на основе её идентификатора.
 
-    :param directory: путь к директории, куда будут скачиваться картинки.
-    :param img_id: идентификатор картинки.
+    :param filename: будущее имя скаченного изображения (может содержать и путь до него).
     :param img_address: сетевой адрес картинки.
     :return: Успешно или неуспешно прошла операция загрузки.
     """
-    filename = f'{directory}/{str(img_id).rjust(4, "0")}.jpg'
-    picture = requests.get(f'https:{img_address}', HEADERS)
+    picture = requests.get(img_address, HEADERS)
     if picture.status_code == 200:
         direct = open(filename, 'wb')
         direct.write(picture.content)
@@ -29,18 +27,20 @@ def download_picture(directory, img_id, img_address):
 def directory_manager(directory):
     """
     Создаёт новую директорию с выбранным именем, а также все промежуточные директории, если их нет.
-    Если директория уже создана, пересоздаёт её.
+    Если директория уже создана, оповестит об этом.
 
     :param directory: имя новой директории (может содержать и промежуточные директории).
     :return: Нет возвращаемого значения.
     """
+    folder = os.path.split(directory)
     try:
         os.makedirs(directory)
+        print(f'Папка {folder[1]} успешно создана.')
     except OSError:
-        return
+        print(f'Папка {folder[1]} уже существует.')
 
 
-def download_quantity_of_photos(search_name, quantity, directory):
+def download_quantity_of_photos(search_name, quantity, directory, url='https://yandex.ru/images/'):
     """
     Получает html код страницы https://yandex.ru/images для выбранного поискового запроса.
     Находит в этом коде выбранное количество картинок, соответствующих запросу.
@@ -49,9 +49,9 @@ def download_quantity_of_photos(search_name, quantity, directory):
     :param search_name: поисковый запрос.
     :param quantity: количество соответствующих запросу картинок, подлежащих скачиванию.
     :param directory: путь к директории, куда будут скачиваться картинки.
+    :param url: адрес страницы, с которой будет осуществляться поиск.
     :return: Нет возвращаемого значения.
     """
-    url = 'https://yandex.ru/images/'
     checker = 0
     images = []
     page = 0
@@ -75,7 +75,7 @@ def download_quantity_of_photos(search_name, quantity, directory):
                     no_repeat = 0
                     repeaters = 13
                 if repeaters == 0:
-                    images.append(image['src'])
+                    images.append('https:' + image['src'])
                     no_repeat += 1
                     bar.update(1)
                 else:
@@ -85,13 +85,16 @@ def download_quantity_of_photos(search_name, quantity, directory):
         page += 1
     del bar
     for i in tqdm(range(len(images))):
-        if not download_picture(directory, i, images[i]):
+        filename = os.path.join(directory, f'{str(i).rjust(4, "0")}.jpg')
+        if not download_picture(filename, images[i]):
             print(f'Ошибка загрузки изображения. Его id: {i}')
     del images
 
 
 if __name__ == '__main__':
-    directory_manager('dataset/tiger')
-    directory_manager('dataset/leopard')
-    download_quantity_of_photos('tiger', 1100, 'dataset/tiger')
-    download_quantity_of_photos('leopard', 1100, 'dataset/leopard')
+    tiger_path = os.path.join('dataset', 'tiger')
+    leopard_path = os.path.join('dataset', 'leopard')
+    directory_manager(tiger_path)
+    directory_manager(leopard_path)
+    # download_quantity_of_photos('tiger', 1100, 'dataset/tiger')
+    # download_quantity_of_photos('leopard', 1100, 'dataset/leopard')
