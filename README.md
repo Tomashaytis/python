@@ -2,7 +2,7 @@
 
 ## Состав лабораторных работ:
 [Лабораторная 1](https://github.com/itsecd/python/tree/master/Lab1) - Автоматизированный сбор данных. Работа со строками;  
-[Лабораторная 2](https://github.com/itsecd/python/tree/master/Lab2) - TBA;  
+[Лабораторная 2](https://github.com/itsecd/python/tree/master/Lab2) - Обработка данных;  
 [Лабораторная 3](https://github.com/itsecd/python/tree/master/Lab3) - TBA;  
 [Лабораторная 4](https://github.com/itsecd/python/tree/master/Lab4) - TBA;  
 Лабораторная 5 - TBA;  
