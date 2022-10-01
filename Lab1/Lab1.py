@@ -56,39 +56,37 @@ def download_quantity_of_photos(search_name, quantity, directory, url='https://y
     :param min_page_photos: Минимальное количество картинок на странице сайта.
     :return: Нет возвращаемого значения.
     """
-    no_repeat = 0
-    repeaters = 0
+    unique_photos = 0
     page = 0
     images = []
     bar = tqdm(total=quantity, desc='Процесс поиска изображений: ', ncols=120)
     while len(images) <= quantity:
         html_page = requests.get(f'{url}search?p={page}&text={search_name}&lr=51&rpt=image', HEADERS)
         if html_page.status_code != 200:
-            del bar
+            bar.close()
+            del images
             logging.warning(f' Запрос не был выполнен. Код ответа сайта: {html_page.status_code}')
             return
         html_page = html_page.text
         soup = BeautifulSoup(html_page, 'lxml')
         page_img = soup.find_all('img')
         if len(page_img) < min_page_photos:
-            del bar
-            logging.warning(' На страницах результатов нет картинок.')
+            bar.close()
+            del images
+            logging.warning(' На страницах результатов почти нет картинок. Возможно вас заблокировали.')
             return
         for image in page_img:
             if len(image['src']) and image['src'][0] == '/':
-                if no_repeat == 30:
-                    no_repeat = 0
-                    repeaters = 13
-                if repeaters == 0:
+                if unique_photos == 30:
+                    unique_photos = -13
+                if unique_photos >= 0:
                     images.append(f"https:{image['src']}")
-                    no_repeat += 1
                     bar.update(1)
-                else:
-                    repeaters -= 1
+                unique_photos += 1
         page += 1
-    del bar
-    for i in tqdm(range(len(images)), desc='Процесс скачивания изображений: ', ncols=120):
-        filename = os.path.join(directory, f'{str(i).rjust(4, "0")}.jpg')
+    bar.close()
+    for i in tqdm(range(len(images)), desc='Процесс загрузки изображений: ', ncols=120):
+        filename = os.path.join(directory, f'{i:04d}.jpg')
         download_picture(filename, images[i])
     del images
 
