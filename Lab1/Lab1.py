@@ -3,7 +3,7 @@ import requests
 from bs4 import BeautifulSoup
 import logging
 from tqdm import tqdm
-HEADERS = {"User-Agent": "Mozilla/5.0"}
+HEADERS = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/104.0.0.0 Safari/537.36"}
 
 logger = logging.getLogger()
 logger.setLevel('INFO')
@@ -56,7 +56,6 @@ def download_quantity_of_photos(search_name, quantity, directory, url='https://y
     :param min_page_photos: Минимальное количество картинок на странице сайта.
     :return: Нет возвращаемого значения.
     """
-    unique_photos = 0
     page = 0
     images = []
     bar = tqdm(total=quantity, desc='Процесс поиска изображений: ', ncols=120)
@@ -69,20 +68,15 @@ def download_quantity_of_photos(search_name, quantity, directory, url='https://y
             return
         html_page = html_page.text
         soup = BeautifulSoup(html_page, 'lxml')
-        page_img = soup.find_all('img')
+        page_img = soup.find_all('img', class_="serp-item__thumb justifier__thumb")
         if len(page_img) < min_page_photos:
             bar.close()
             del images
             logging.warning(' На страницах результатов почти нет картинок. Возможно вас заблокировали.')
             return
         for image in page_img:
-            if len(image['src']) and image['src'][0] == '/':
-                if unique_photos == 30:
-                    unique_photos = -13
-                if unique_photos >= 0:
-                    images.append(f"https:{image['src']}")
-                    bar.update(1)
-                unique_photos += 1
+            images.append(f"https:{image['src']}")
+            bar.update(1)
         page += 1
     bar.close()
     for i in tqdm(range(len(images)), desc='Процесс загрузки изображений: ', ncols=120):
