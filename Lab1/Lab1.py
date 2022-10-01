@@ -91,9 +91,9 @@ def download_quantity_of_photos(search_name, quantity, directory, url='https://y
 
 
 if __name__ == '__main__':
-    tiger_path = os.path.join('dataset', 'tiger1')
-    leopard_path = os.path.join('dataset', 'leopard1')
+    tiger_path = os.path.join('dataset', 'tiger')
+    leopard_path = os.path.join('dataset', 'leopard')
     directory_manager(tiger_path)
     directory_manager(leopard_path)
-    download_quantity_of_photos('tiger', 100, tiger_path)
-    download_quantity_of_photos('leopard', 100, leopard_path)
+    download_quantity_of_photos('tiger', 1100, tiger_path)
+    download_quantity_of_photos('leopard', 1100, leopard_path)
