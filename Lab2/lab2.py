@@ -2,6 +2,7 @@ import csv
 import os
 import logging
 import shutil
+from random import randint
 from typing import List
 
 logger = logging.getLogger()
@@ -67,6 +68,18 @@ class ClassManager:
         except OSError as err:
             logging.warning(f' При попытке открытия аннотации по пути {self._dataset_dir} произошла ошибка:\n{err}.')
         return res
+    
+    @staticmethod
+    def _copy_img(img_path: str, path_to_copy: str, old_img_name: str, new_img_name: str) -> None:
+        cur_dir = os.getcwd()
+        try:
+            shutil.copy(img_path, path_to_copy)
+            os.chdir(path_to_copy)
+            os.rename(old_img_name, new_img_name)
+            os.chdir(cur_dir)
+        except OSError as err:
+            os.chdir(cur_dir)
+            raise err
 
     def copy_dataset(self, path_to_copy: str) -> None:
         self.create_directory(path_to_copy)
@@ -76,21 +89,42 @@ class ClassManager:
             for img_name in os.listdir(class_path[1]):
                 img_path = os.path.join(class_path[1], img_name)
                 old_img_name = os.path.split(img_path)[1]
-                cur_dir = os.getcwd()
+                new_img_name = f'{class_path[2]}_{old_img_name}'
                 try:
-                    new_img_path = shutil.copy(img_path, path_to_copy)
-                    os.chdir(path_to_copy)
-                    os.rename(old_img_name, f'{class_path[2]}_{old_img_name}')
+                    self._copy_img(img_path, path_to_copy, old_img_name, new_img_name)
                 except OSError as err:
-                    logging.warning(f' При попытке копирования файла {old_img_name} из папки {class_path[0]} в папку '
+                    logging.warning(f' При попытке копирования файла {old_img_name} в папку '
                                     f'{path_to_copy} произошла ошибка:\n{err}.')
-                    os.chdir(cur_dir)
-                    return
+
+    def random_dataset(self, path_to_copy: str) -> None:
+        self.create_directory(path_to_copy)
+        self.create_annotation()
+        class_list = self.read_annotation()
+        for class_path in class_list:
+            for img_name in os.listdir(class_path[1]):
+                img_path = os.path.join(class_path[1], img_name)
+                old_img_name = os.path.split(img_path)[1]
+                new_img_name = f'{randint(0, 9999)}.jpg'
+                while True:
+                    try:
+                        self._copy_img(img_path, path_to_copy, old_img_name, new_img_name)
+                        break
+                    except FileExistsError:
+                        new_img_name = f'{randint(0, 9999)}.jpg'
+                    except OSError as err:
+                        logging.warning(f' При попытке копирования файла {old_img_name} в папку '
+                                        f'{path_to_copy} произошла ошибка:\n{err}.')
+                        return
+        dataset = self._dataset_dir
+        self._dataset_dir = os.getcwd()
+        self.create_annotation()
+        self._dataset_dir = dataset
 
 
 if __name__ == "__main__":
     cm = ClassManager('dataset')
-    cm.copy_dataset('dataset1')
+    # cm.random_dataset('who')
+    # cm.copy_dataset('dataset1')
     '''cm.create_annotation()
     a = cm.read_annotation()
     for i in a:
