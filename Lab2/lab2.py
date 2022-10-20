@@ -7,6 +7,7 @@ from typing import List
 
 logger = logging.getLogger()
 logger.setLevel('INFO')
+CLASSES = ["tiger", "leopard"]
 
 
 class ClassManager:
