@@ -45,12 +45,11 @@ def copy_dataset(dataset: str, path_to_copy: str) -> None:
         old_img_name = os.path.split(exemplar[1])[1]
         new_img_name = f'{exemplar[2]}_{old_img_name}'
         try:
-            copy_img(exemplar[1], path_to_copy, old_img_name, new_img_name)
+            copy_img(exemplar[0], path_to_copy, old_img_name, new_img_name)
+            copy_an.add(exemplar[2], new_img_name)
         except OSError as err:
             logging.warning(f' При попытке копирования файла {old_img_name} в папку '
                             f'{path_to_copy} произошла ошибка:\n{err}.')
-    for n in range(len(exemplars)):
-        copy_an.add(exemplars[n][2], n)
     copy_an.create()
 
 
