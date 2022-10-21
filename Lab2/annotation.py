@@ -8,6 +8,9 @@ CLASSES = ["tiger", "leopard"]
 
 
 class Annotation:
+    """
+    Класс предлагает методы для работы с аннотацией к датасету.
+    """
     _annotation_dir: str
     _exemplars: list
 
