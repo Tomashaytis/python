@@ -24,14 +24,14 @@ def random_dataset(dataset: str, path_to_copy: str) -> None:
     copy_an = Annotation(path_to_copy)
     for exemplar in exemplars:
         old_file_name = os.path.split(exemplar[1])[1]
-        new_file_name = f'{randint(0, 9999)}.jpg'
+        new_file_name = f'{randint(0, 9999):04d}.jpg'
         while True:
             try:
                 copy_file(exemplar[1], path_to_copy, new_file_name)
                 copy_an.add(exemplar[2], new_file_name)
                 break
             except FileExistsError:
-                new_file_name = f'{randint(0, 9999)}.jpg'
+                new_file_name = f'{randint(0, 9999):04d}.jpg'
             except OSError as err:
                 logging.warning(f' При попытке копирования файла {old_file_name} в папку '
                                 f'{path_to_copy} произошла ошибка:\n{err}.')

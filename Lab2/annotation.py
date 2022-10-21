@@ -52,7 +52,12 @@ class Annotation:
         files = os.listdir(self._annotation_dir)
         for n in range(len(files) - 1):
             self.add(class_mark, f'{n:04d}.jpg')
-        self.create()
+        columns = ['absolute path', 'relative path', 'class']
+        an_path = os.path.join(self._annotation_dir, 'annotation.csv')
+        with open(an_path, 'w', newline='') as file:
+            writer = csv.DictWriter(file, columns)
+            writer.writeheader()
+            writer.writerows(self._exemplars)
 
     def create(self) -> None:
         """
