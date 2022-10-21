@@ -1,7 +1,6 @@
 import os
 import csv
 import logging
-from typing import List
 
 logger = logging.getLogger()
 logger.setLevel('INFO')
@@ -10,12 +9,11 @@ CLASSES = ["tiger", "leopard"]
 
 class Annotation:
     _annotation_dir: str
-    _exemplars: List
+    _exemplars: list
 
     def __init__(self, dataset_dir):
         """
         При инициализации задаётся директория, содержащая экземпляры класса.
-        Создаётся файл annotation.csv, если он ещё не был создан.
 
         :param dataset_dir: Путь к датасету с экземплярами класса.
         """
@@ -27,7 +25,7 @@ class Annotation:
 
     def add(self, class_mark: str, exemplar: str) -> None:
         """
-        Добавляет к файлу-аннотации следующий по счёту экземпляр с меткой класса class_mark.
+        Добавляет новую строку для экземпляра exemplar с меткой класса class_mark к сохранённым значениям внутри класса.
 
         :param exemplar: Экземпляр класса (имя файла).
         :param class_mark: Метка класса добавляемого экземпляра.
@@ -59,6 +57,7 @@ class Annotation:
     def create(self) -> None:
         """
         Создаёт аннотацию, используя сохранённые значения внутри класса.
+        Если аннотация уже существует, добавит к сохранённым строкам строки существующей аннотации.
 
         :return: Нет возвращаемого значения.
         """
@@ -75,7 +74,7 @@ class Annotation:
             writer.writeheader()
             writer.writerows(self._exemplars)
 
-    def read(self) -> List:
+    def read(self) -> list:
         """
         Читает аннотацию, возвращая список с путями к экземплярам и их метками классов.
 
@@ -95,5 +94,4 @@ class Annotation:
 if __name__ == "__main__":
     for i in CLASSES:
         an = Annotation(os.path.join('dataset', i))
-        # an.create_for_class(i)
-        print(an.read())
+        an.create_for_class(i)
