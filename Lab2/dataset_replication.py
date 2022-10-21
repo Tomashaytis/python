@@ -24,21 +24,21 @@ def create_directory(path):
         logging.info(f' При попытке создания папки {folder[1]} произошла ошибка:\n{err}.')
 
 
-def copy_file(file_path: str, path_to_copy: str, new_file_name: str) -> None:
+def copy_file(file_path: str, path_to_copy: str, new_filename: str) -> None:
     """
     Копирует файл, с местоположением file_path, в папку, с местоположением path_to_copy.
     Переименовывает файл (Новое имя - new_file_name).
 
     :param file_path: Путь до файла.
     :param path_to_copy: Путь до директории, в которую необходимо скопировать файл.
-    :param new_file_name: Новое имя файла.
+    :param new_filename: Новое имя файла.
     :return: Нет возвращаемого значения.
     """
     cur_dir = os.getcwd()
     try:
         shutil.copy(file_path, path_to_copy)
         os.chdir(path_to_copy)
-        os.rename(os.path.split(file_path)[1], new_file_name)
+        os.rename(os.path.split(file_path)[1], new_filename)
         os.chdir(cur_dir)
     except OSError as err:
         os.chdir(cur_dir)
@@ -61,13 +61,13 @@ def copy_dataset(dataset: str, path_to_copy: str) -> None:
     exemplars = dataset_an.read()
     copy_an = Annotation(path_to_copy)
     for exemplar in exemplars:
-        old_file_name = os.path.split(exemplar[1])[1]
-        new_file_name = f'{exemplar[2]}_{old_file_name}'
+        old_filename = os.path.split(exemplar[1])[1]
+        new_filename = f'{exemplar[2]}_{old_filename}'
         try:
-            copy_file(exemplar[0], path_to_copy, new_file_name)
-            copy_an.add(exemplar[2], new_file_name)
+            copy_file(exemplar[0], path_to_copy, new_filename)
+            copy_an.add(exemplar[2], new_filename)
         except OSError as err:
-            logging.warning(f' При попытке копирования файла {old_file_name} в папку '
+            logging.warning(f' При попытке копирования файла {old_filename} в папку '
                             f'{path_to_copy} произошла ошибка:\n{err}.')
     copy_an.create()
 

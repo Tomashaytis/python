@@ -33,7 +33,7 @@ class ExemplarIterator:
         Возвращает следующий экземпляр класса на основе текущего.
         Если его нет - бросает исключение StopIteration.
 
-        :return: Следующий экземпляр.
+        :return: Следующий экземпляр класса.
         """
         try:
             self._exemplar = next_exemplar(self._exemplar)

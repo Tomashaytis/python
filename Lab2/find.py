@@ -4,6 +4,12 @@ import re
 
 
 def next_exemplar(current_exemplar_path: str) -> Optional[str]:
+    """
+    Возвращает следующий экземпляр класса на основе предыдущего (current_exemplar_path) и None, если экземпляры закончились.
+
+    :param current_exemplar_path: Путь к текущему экземпляру класса.
+    :return: Следующий экземпляр класса или None (если они закончились).
+    """
     if not os.path.exists(current_exemplar_path):
         raise FileExistsError(f'Файл по пути {current_exemplar_path} не существует.')
     cur_dir, old_filename = os.path.split(current_exemplar_path)
