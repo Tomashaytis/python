@@ -1,14 +1,10 @@
 import os
 import logging
 import shutil
-from annotation import Annotation
-
-logger = logging.getLogger()
-logger.setLevel('INFO')
-CLASSES = ["tiger", "leopard"]
+from annotation import Annotation, CLASSES
 
 
-def create_directory(path):
+def create_directory(path: str) -> None:
     """
     Создаёт новую директорию с выбранным именем, а также все промежуточные директории, если их нет.
     Если директория уже создана, оповестит об этом.
@@ -58,14 +54,14 @@ def copy_dataset(dataset: str, path_to_copy: str) -> None:
     if not os.path.exists(path_to_copy):
         create_directory(path_to_copy)
     dataset_an = Annotation(dataset)
-    exemplars = dataset_an.read()
+    instances = dataset_an.read()
     copy_an = Annotation(path_to_copy)
-    for exemplar in exemplars:
-        old_filename = os.path.split(exemplar[1])[1]
-        new_filename = f'{exemplar[2]}_{old_filename}'
+    for instance in instances:
+        old_filename = os.path.split(instance[1])[1]
+        new_filename = f'{instance[2]}_{old_filename}'
         try:
-            copy_file(exemplar[0], path_to_copy, new_filename)
-            copy_an.add(exemplar[2], new_filename)
+            copy_file(instance[0], path_to_copy, new_filename)
+            copy_an.add(instance[2], new_filename)
         except OSError as err:
             logging.warning(f' При попытке копирования файла {old_filename} в папку '
                             f'{path_to_copy} произошла ошибка:\n{err}.')

@@ -1,24 +1,23 @@
 import os
 import logging
-from find import next_exemplar
+from find import next_instance
 
 logger = logging.getLogger()
 logger.setLevel('INFO')
 
 
-class ExemplarIterator:
+class InstanceIterator:
     """
     Класс-итератор для работы с экземплярами классов.
     """
-    _exemplar: str
 
-    def __init__(self, exemplar: str):
+    def __init__(self, instance: str):
         """
         Инициализирует итератор экземпляром exemplar, который содержит путь до него.
 
-        :param exemplar: Путь до экземпляра.
+        :param instance: Путь до экземпляра.
         """
-        self._exemplar = exemplar
+        self._instance = instance
 
     def __iter__(self):
         """
@@ -36,18 +35,18 @@ class ExemplarIterator:
         :return: Следующий экземпляр класса.
         """
         try:
-            self._exemplar = next_exemplar(self._exemplar)
+            self._instance = next_instance(self._instance)
         except OSError as error:
             raise error
-        if self._exemplar is not None:
-            return self._exemplar
+        if self._instance is not None:
+            return self._instance
         else:
             raise StopIteration
 
 
 if __name__ == "__main__":
     dataset = 'dataset1'
-    ei = ExemplarIterator(os.path.join(dataset, 'leopard_0000.jpg'))
+    ei = InstanceIterator(os.path.join(dataset, 'leopard_0000.jpg'))
     try:
         while True:
             ei.__next__()

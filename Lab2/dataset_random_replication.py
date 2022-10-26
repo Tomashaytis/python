@@ -1,12 +1,8 @@
 import os
 import logging
 from random import randint
-from annotation import Annotation
+from annotation import Annotation, CLASSES
 from dataset_replication import create_directory, copy_file
-
-logger = logging.getLogger()
-logger.setLevel('INFO')
-CLASSES = ["tiger", "leopard"]
 
 
 def random_dataset(dataset: str, path_to_copy: str) -> None:
@@ -21,15 +17,15 @@ def random_dataset(dataset: str, path_to_copy: str) -> None:
     if not os.path.exists(path_to_copy):
         create_directory(path_to_copy)
     dataset_an = Annotation(dataset)
-    exemplars = dataset_an.read()
+    instances = dataset_an.read()
     copy_an = Annotation(path_to_copy)
-    for exemplar in exemplars:
-        old_filename = os.path.split(exemplar[1])[1]
+    for instance in instances:
+        old_filename = os.path.split(instance[1])[1]
         new_filename = f'{randint(0, 9999):04d}.jpg'
         while True:
             try:
-                copy_file(exemplar[1], path_to_copy, new_filename)
-                copy_an.add(exemplar[2], new_filename)
+                copy_file(instance[1], path_to_copy, new_filename)
+                copy_an.add(instance[2], new_filename)
                 break
             except FileExistsError:
                 new_filename = f'{randint(0, 9999):04d}.jpg'
