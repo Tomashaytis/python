@@ -36,6 +36,7 @@ class InstanceIterator:
         """
         try:
             self._instance = next_instance(self._instance)
+            print(self._instance)
         except OSError as error:
             raise error
         if self._instance is not None:
@@ -45,8 +46,8 @@ class InstanceIterator:
 
 
 if __name__ == "__main__":
-    dataset = 'dataset1'
-    ei = InstanceIterator(os.path.join(dataset, 'leopard_0000.jpg'))
+    dataset = 'who'
+    ei = InstanceIterator(os.path.join(dataset, '0004.jpg'))
     try:
         while True:
             ei.__next__()

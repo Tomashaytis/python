@@ -60,21 +60,26 @@ class Annotation:
             writer.writeheader()
             writer.writerows(self._instances)
 
-    def create(self) -> None:
+    def add_from_old_annotation(self) -> None:
         """
-        Создаёт аннотацию, используя сохранённые значения внутри класса.
-        Если аннотация уже существует, добавит к сохранённым строкам строки существующей аннотации.
+        Добавляет данные из уже существующей аннотации, к сохранённым значениям внутри класса.
 
         :return: Нет возвращаемого значения.
         """
-        an_path = os.path.join(self._annotation_dir, 'annotation.csv')
-        if os.path.exists(an_path):
+        if os.path.exists(os.path.join(self._annotation_dir, 'annotation.csv')):
             rows = self.read()
             adder = []
             for row in rows:
                 adder = adder + [dict(zip(self.__header, row))]
             self._instances = adder + self._instances
-        with open(an_path, 'w', newline='') as file:
+
+    def create(self) -> None:
+        """
+        Создаёт аннотацию, используя сохранённые значения внутри класса.
+
+        :return: Нет возвращаемого значения.
+        """
+        with open(os.path.join(self._annotation_dir, 'annotation.csv'), 'w', newline='') as file:
             writer = csv.DictWriter(file, self.__header)
             writer.writeheader()
             writer.writerows(self._instances)

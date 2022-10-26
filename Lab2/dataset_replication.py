@@ -30,14 +30,13 @@ def copy_file(file_path: str, path_to_copy: str, new_filename: str) -> None:
     :param new_filename: Новое имя файла.
     :return: Нет возвращаемого значения.
     """
-    cur_dir = os.getcwd()
     try:
         shutil.copy(file_path, path_to_copy)
-        os.chdir(path_to_copy)
-        os.rename(os.path.split(file_path)[1], new_filename)
-        os.chdir(cur_dir)
+        old_file_path = os.path.join(path_to_copy, os.path.split(file_path)[1])
+        new_file_path = os.path.join(path_to_copy, new_filename)
+        print(old_file_path, new_file_path)
+        os.rename(old_file_path, new_file_path)
     except OSError as err:
-        os.chdir(cur_dir)
         raise err
 
 
@@ -65,9 +64,10 @@ def copy_dataset(dataset: str, path_to_copy: str) -> None:
         except OSError as err:
             logging.warning(f' При попытке копирования файла {old_filename} в папку '
                             f'{path_to_copy} произошла ошибка:\n{err}.')
+    copy_an.add_from_old_annotation()
     copy_an.create()
 
 
 if __name__ == "__main__":
     for i in CLASSES:
-        copy_dataset(os.path.join('dataset', i), 'dataset1')
+        copy_dataset(os.path.join('dataset', i), 'dataset2')
