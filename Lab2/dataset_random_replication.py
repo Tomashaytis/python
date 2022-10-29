@@ -21,13 +21,13 @@ def random_dataset(dataset: str, path_to_copy: str) -> None:
     while len(random_numbers) != len(instances):
         random_numbers.add(randint(0, 9999))
     random_numbers = list(random_numbers)
-    for inst in range(len(instances)):
-        new_filename = f'{random_numbers[inst]:04d}.jpg'
-        new_filename_path = os.path.join(os.path.split(instances[inst][1])[0], new_filename)
-        old_filename_path = instances[inst][1]
+    for inst, rand in zip(instances, random_numbers):
+        new_filename = f'{rand:04d}.jpg'
+        new_filename_path = os.path.join(os.path.split(inst[1])[0], new_filename)
+        old_filename_path = inst[1]
         try:
             os.rename(old_filename_path, new_filename_path)
-            copy_an.add(instances[inst][2], new_filename)
+            copy_an.add(inst[2], new_filename)
         except OSError as err:
             logging.warning(f' При попытке переименования файла по пути {old_filename_path} в папке '
                             f'{path_to_copy} произошла ошибка:\n{err}.')

@@ -22,9 +22,3 @@ def next_instance(current_instance_path: str) -> Optional[str]:
         if os.path.exists(new_filename):
             return new_filename
     return None
-
-
-if __name__ == "__main__":
-    print(next_instance('dataset\\tiger\\0111.jpg'))
-    print(next_instance('dataset1\\tiger_0023.jpg'))
-    print(next_instance('who\\0050.jpg'))

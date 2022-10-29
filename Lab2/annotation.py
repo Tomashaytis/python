@@ -52,13 +52,9 @@ class Annotation:
         :return: Нет возвращаемого значения.
         """
         files = os.listdir(self._annotation_dir)
-        for n in range(len(files) - 1):
+        for n in range(len(files)):
             self.add(class_mark, f'{n:04d}.jpg')
-        an_path = os.path.join(self._annotation_dir, 'annotation.csv')
-        with open(an_path, 'w', newline='') as file:
-            writer = csv.DictWriter(file, self.__header)
-            writer.writeheader()
-            writer.writerows(self._instances)
+        self.create()
 
     def add_from_old_annotation(self) -> None:
         """

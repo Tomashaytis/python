@@ -1,9 +1,4 @@
-import os
-import logging
 from find import next_instance
-
-logger = logging.getLogger()
-logger.setLevel('INFO')
 
 
 class InstanceIterator:
@@ -36,22 +31,9 @@ class InstanceIterator:
         """
         try:
             self._instance = next_instance(self._instance)
-            print(self._instance)
         except OSError as error:
             raise error
         if self._instance is not None:
             return self._instance
         else:
             raise StopIteration
-
-
-if __name__ == "__main__":
-    dataset = 'who'
-    ei = InstanceIterator(os.path.join(dataset, '0004.jpg'))
-    try:
-        while True:
-            ei.__next__()
-    except StopIteration:
-        logging.info('Все данные датасета перебраны')
-    except OSError as err:
-        logging.warning(f'При переборе датасета {dataset} возникла ошибка:\n{err}')

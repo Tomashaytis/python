@@ -34,7 +34,6 @@ def copy_file(file_path: str, path_to_copy: str, new_filename: str) -> None:
         shutil.copy(file_path, path_to_copy)
         old_file_path = os.path.join(path_to_copy, os.path.split(file_path)[1])
         new_file_path = os.path.join(path_to_copy, new_filename)
-        print(old_file_path, new_file_path)
         os.rename(old_file_path, new_file_path)
     except OSError as err:
         raise err
@@ -70,4 +69,4 @@ def copy_dataset(dataset: str, path_to_copy: str) -> None:
 
 if __name__ == "__main__":
     for i in CLASSES:
-        copy_dataset(os.path.join('dataset', i), 'dataset2')
+        copy_dataset(os.path.join('dataset', i), 'dataset1')
