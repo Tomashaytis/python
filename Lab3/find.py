@@ -13,7 +13,7 @@ def next_instance(current_instance_path: str) -> Optional[str]:
     """
     if not os.path.exists(current_instance_path):
         raise FileExistsError(f'Файл по пути {current_instance_path} не существует.')
-    an = Annotation(os.path.split(current_instance_path)[0])
+    an = Annotation(os.path.split(current_instance_path)[0], os.path.split(current_instance_path)[0])
     instances = an.read()
     for inst in range(len(instances) - 1):
         if instances[inst][1] == os.path.relpath(current_instance_path):

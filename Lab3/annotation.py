@@ -1,6 +1,7 @@
 import os
 import csv
 import logging
+from typing import Optional
 
 logger = logging.getLogger()
 logger.setLevel('INFO')
@@ -12,13 +13,19 @@ class Annotation:
     Класс предлагает методы для работы с аннотацией к датасету.
     """
 
-    def __init__(self, dataset_dir: str):
+    def __init__(self, dataset_dir: str, annotation_dir: Optional[str] = None, annotation_name: str = 'annotation.csv'):
         """
-        При инициализации задаётся директория, содержащая экземпляры класса.
+        При инициализации задаётся директория, содержащая экземпляры класса и директория для аннотации.
 
         :param dataset_dir: Путь к датасету с экземплярами класса.
+        :param annotation_dir: Путь к файлу-назначению для аннотации (По умолчанию - в папке с датасетом).
+        :param annotation_name: Имя файла-аннотации (по умолчанию - annotation.csv).
         """
-        self._annotation_dir = dataset_dir
+        if annotation_dir is None:
+            annotation_dir = dataset_dir
+        self._dataset_dir = dataset_dir
+        self._annotation_dir = annotation_dir
+        self._annotation_name = annotation_name
         self._instances = []
         self.__header = ['absolute path', 'relative path', 'class']
 
@@ -34,15 +41,15 @@ class Annotation:
         :return: Нет возвращаемого значения.
         """
         try:
-            cur_ex = os.path.join(self._annotation_dir, instance)
-            if not os.path.exists(cur_ex):
+            cur_inst = os.path.join(self._dataset_dir, instance)
+            if not os.path.exists(cur_inst):
                 return
-            class_instance = {self.__header[0]: os.path.abspath(cur_ex),
-                              self.__header[1]: os.path.relpath(cur_ex),
+            class_instance = {self.__header[0]: os.path.abspath(cur_inst),
+                              self.__header[1]: os.path.relpath(cur_inst),
                               self.__header[2]: class_mark}
             self._instances.append(class_instance)
         except OSError as err:
-            logging.warning(f' При работе с файлами {self._annotation_dir} произошла ошибка:\n{err}.')
+            logging.warning(f' При работе с файлами {self._dataset_dir} произошла ошибка:\n{err}.')
 
     def create_for_class(self, class_mark: str) -> None:
         """
@@ -51,7 +58,7 @@ class Annotation:
         :param class_mark: Метка класса.
         :return: Нет возвращаемого значения.
         """
-        files = os.listdir(self._annotation_dir)
+        files = os.listdir(self._dataset_dir)
         for n in range(len(files)):
             self.add(class_mark, f'{n:04d}.jpg')
         self.create()
@@ -62,7 +69,7 @@ class Annotation:
 
         :return: Нет возвращаемого значения.
         """
-        if os.path.exists(os.path.join(self._annotation_dir, 'annotation.csv')):
+        if os.path.exists(os.path.join(self._annotation_dir, self._annotation_name)):
             rows = self.read()
             adder = []
             for row in rows:
@@ -75,7 +82,7 @@ class Annotation:
 
         :return: Нет возвращаемого значения.
         """
-        with open(os.path.join(self._annotation_dir, 'annotation.csv'), 'w', newline='') as file:
+        with open(os.path.join(self._annotation_dir, self._annotation_name), 'w', newline='') as file:
             writer = csv.DictWriter(file, self.__header)
             writer.writeheader()
             writer.writerows(self._instances)
@@ -88,7 +95,7 @@ class Annotation:
         """
         res = []
         try:
-            with open(os.path.join(self._annotation_dir, 'annotation.csv'), 'r', newline='') as file:
+            with open(os.path.join(self._annotation_dir, self._annotation_name), 'r', newline='') as file:
                 rows = csv.DictReader(file)
                 for row in rows:
                     res.append([row[self.__header[0]], row[self.__header[1]], row[self.__header[2]]])
@@ -104,7 +111,7 @@ class Annotation:
         """
         res = []
         try:
-            with open(os.path.join(self._annotation_dir, 'annotation.csv'), 'r', newline='') as file:
+            with open(os.path.join(self._annotation_dir, self._annotation_name), 'r', newline='') as file:
                 rows = csv.DictReader(file)
                 for row in rows:
                     res = [row[self.__header[0]], row[self.__header[1]], row[self.__header[2]]]
@@ -116,5 +123,5 @@ class Annotation:
 
 if __name__ == "__main__":
     for i in CLASSES:
-        an = Annotation(os.path.join('dataset', i))
+        an = Annotation(os.path.join('dataset', i), os.path.join('dataset', i))
         an.create_for_class(i)

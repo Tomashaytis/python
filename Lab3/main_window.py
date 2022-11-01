@@ -1,30 +1,35 @@
 import sys
 from PyQt6.QtCore import QSize
-from PyQt6.QtWidgets import QApplication, QMainWindow, QPushButton, QFileDialog, QLabel, QVBoxLayout, QWidget
+from PyQt6.QtWidgets import QApplication, QMainWindow, QPushButton, QFileDialog, QLabel, QGridLayout, QWidget
+from PyQt6.QtGui import QPixmap
 
 
 class MainWindow(QMainWindow):
     def __init__(self):
-        super().__init__()
+        super(MainWindow, self).__init__()
         self.setWindowTitle("My App")
         dataset_path = QFileDialog.getExistingDirectory(self, 'Введите путь к папке исходного датасета')
-        lbl1 = QLabel(f'Текущий исходный датасет: {dataset_path}', self)
-        lbl1.setFixedSize(QSize(400, 50))
-        lbl1.move(10, 0)
-        h_box = QVBoxLayout()
-        h_box.addStretch(1)
-        change_dataset_button = QPushButton("Изменить исходный датасет")
-        change_dataset_button.setFixedSize(QSize(200, 100))
-        h_box.addWidget(change_dataset_button)
+        src = QLabel(f'Текущий исходный датасет: {dataset_path}', self)
+        src.setFixedSize(QSize(400, 20))
+        layout = QGridLayout()
+        layout.addWidget(src, 0, 1)
         copy_dataset_button = QPushButton("Скопировать датасет")
-        copy_dataset_button.setFixedSize(QSize(200, 100))
-        h_box.addWidget(copy_dataset_button)
+        copy_dataset_button.setFixedSize(QSize(200, 50))
+        layout.addWidget(copy_dataset_button, 3, 5)
         copy_random_dataset_button = QPushButton("Рандомизировать датасет")
-        copy_random_dataset_button.setFixedSize(QSize(200, 100))
-        h_box.addWidget(copy_random_dataset_button)
+        copy_random_dataset_button.setFixedSize(QSize(200, 50))
+        layout.addWidget(copy_random_dataset_button, 4, 5)
+        next_tiger_button = QPushButton("Следующий тигр")
+        next_tiger_button.setFixedSize(QSize(200, 50))
+        layout.addWidget(next_tiger_button, 5, 0)
+        next_leopard_button = QPushButton("Следующий леопард")
+        next_leopard_button.setFixedSize(QSize(200, 50))
+        layout.addWidget(next_leopard_button, 5, 2)
+        label_image = QLabel('Здесь будет картинка')
+        label_image.setFixedSize(QSize(500, 400))
+        layout.addWidget(label_image, 1, 0, 4, 4)
         central_widget = QWidget()
-        central_widget.setLayout(h_box)
-        self.setFixedSize(QSize(500, 500))
+        central_widget.setLayout(layout)
         self.setCentralWidget(central_widget)
         self.show()
 
