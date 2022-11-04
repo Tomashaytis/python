@@ -14,15 +14,15 @@ class InstanceIterator:
         """
         self._instance = instance
 
-    def __iter__(self):
+    def __iter__(self) -> str:
         """
         Возвращает текущий объект итератора.
 
         :return: Текущий объект итератора.
         """
-        return self
+        return self._instance
 
-    def __next__(self):
+    def __next__(self) -> str:
         """
         Возвращает следующий экземпляр класса на основе текущего.
         Если его нет - бросает исключение StopIteration.
