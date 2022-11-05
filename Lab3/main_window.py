@@ -62,7 +62,7 @@ class MainWindow(QMainWindow):
         self.next_leopard_button.setFixedSize(QSize(250, 50))
         self.next_leopard_button.clicked.connect(self.next_leopard)
         layout.addWidget(self.next_leopard_button, 5, 0)
-        self.label_image = QLabel('Здесь будет картинка')
+        self.label_image = QLabel('Нажмите кнопку "Следующий тигр" или "Следующий леопард".')
         self.label_image.setMinimumSize(QSize(500, 300))
         self.label_image.setAlignment(Qt.AlignmentFlag.AlignCenter)
         layout.addWidget(self.label_image, 1, 1, 6, 2)
@@ -74,7 +74,7 @@ class MainWindow(QMainWindow):
             self.next_tiger_button.setEnabled(False)
             self.next_leopard_button.setEnabled(False)
             self.label_image.setText('Ошибка!\n'
-                                     'В исходном датасете отсутствует одна из папок классов: "tiger" или "leopard"')
+                                     'В исходном датасете отсутствует одна из папок классов: "tiger" или "leopard."')
         else:
             an = Annotation(os.path.join(self.dataset_path, CLASSES[0]))
             self.cur_tiger = InstanceIterator(an.first_instance()[1])
@@ -134,7 +134,7 @@ class MainWindow(QMainWindow):
         try:
             self.cur_tiger.__next__()
         except StopIteration:
-            self.label_image.setText("Тигры закончились")
+            self.label_image.setText("Тигры закончились.")
             self.next_tiger_button.setEnabled(False)
         except OSError as err:
             logging.warning(f'При работе итератора была вызвана ошибка:\n{err}')
@@ -151,7 +151,7 @@ class MainWindow(QMainWindow):
         try:
             self.cur_leopard.__next__()
         except StopIteration:
-            self.label_image.setText("Леопарды закончились")
+            self.label_image.setText("Леопарды закончились.")
             self.next_leopard_button.setEnabled(False)
         except OSError as err:
             logging.warning(f'При работе итератора была вызвана ошибка:\n{err}')
