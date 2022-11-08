@@ -2,7 +2,8 @@ import logging
 import os
 import sys
 from PyQt6.QtCore import QSize, Qt
-from PyQt6.QtWidgets import QApplication, QMainWindow, QPushButton, QFileDialog, QLabel, QGridLayout, QWidget
+from PyQt6.QtWidgets import QApplication, QMainWindow, QPushButton, QFileDialog, QLabel, QWidget, \
+    QHBoxLayout, QVBoxLayout
 from PyQt6.QtGui import QPixmap
 from annotation import Annotation
 from iterator import InstanceIterator
@@ -33,20 +34,23 @@ class MainWindow(QMainWindow):
 
         :return: Нет возвращаемого значения.
         """
-        self.setWindowTitle("lab-3")
+        self.setWindowTitle("Dataset Manager")
         self.dataset_path = QFileDialog.getExistingDirectory(self, 'Введите путь к папке исходного датасета')
         src = QLabel(f'Исходный датасет:\n{self.dataset_path}', self)
-        layout = QGridLayout()
-        layout.addWidget(src, 0, 0)
-        create_annotation_button = self.new_button(layout, "Сформировать аннотацию", 250, 50, 1, 0)
-        copy_dataset_button = self.new_button(layout, "Скопировать датасет", 250, 50, 2, 0)
-        copy_random_dataset_button = self.new_button(layout, "Рандомизировать датасет", 250, 50, 3, 0)
-        next_tiger_button = self.new_button(layout, "Следующий тигр", 250, 50, 4, 0)
-        next_leopard_button = self.new_button(layout, "Следующий леопард", 250, 50, 5, 0)
+        v_box1 = QVBoxLayout()
+        v_box1.addStretch(1)
+        v_box1.addWidget(src)
+        create_annotation_button = self.new_button(v_box1, "Сформировать аннотацию", 250, 50)
+        copy_dataset_button = self.new_button(v_box1, "Скопировать датасет", 250, 50)
+        copy_random_dataset_button = self.new_button(v_box1, "Рандомизировать датасет", 250, 50)
+        next_tiger_button = self.new_button(v_box1, "Следующий тигр", 250, 50)
+        next_leopard_button = self.new_button(v_box1, "Следующий леопард", 250, 50)
         self.label_image = QLabel('Нажмите кнопку "Следующий тигр" или "Следующий леопард".')
         self.label_image.setMinimumSize(QSize(500, 300))
         self.label_image.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        layout.addWidget(self.label_image, 1, 1, 6, 2)
+        v_box2 = QVBoxLayout()
+        v_box2.addStretch(1)
+        v_box2.addWidget(self.label_image)
         if not (os.path.exists(os.path.join(self.dataset_path, CLASSES[0])) or
                 os.path.exists(os.path.join(self.dataset_path, CLASSES[1]))):
             create_annotation_button.setEnabled(False)
@@ -71,26 +75,29 @@ class MainWindow(QMainWindow):
         copy_dataset_button.clicked.connect(self.dataset_copy)
         copy_random_dataset_button.clicked.connect(self.dataset_random)
         central_widget = QWidget()
-        central_widget.setLayout(layout)
+        h_box = QHBoxLayout()
+        h_box.addStretch(1)
+        h_box.addLayout(v_box1)
+        h_box.addLayout(v_box2)
+        central_widget.setLayout(h_box)
+        central_widget.setFixedSize(775, 325)
         self.setCentralWidget(central_widget)
         self.show()
 
     @staticmethod
-    def new_button(layout: QGridLayout, button_name: str, width: int, height: int, row: int, col: int) -> QPushButton:
+    def new_button(v_box: QVBoxLayout, button_name: str, width: int, height: int) -> QPushButton:
         """
         Функция создаёт кнопу с заданной шириной и высотой, размещая её в сетке.
 
-        :param layout: Сетка, в которой размещается кнопка.
+        :param v_box: V-бокс, в который добавляется кнопка.
         :param button_name: Текстовое содержимое кнопки.
         :param width: Ширина кнопки.
         :param height: Высота кнопки.
-        :param row: Строка, в которой находится кнопка.
-        :param col: Столбец, в которой находится кнопка.
         :return: Нет возвращаемого значения.
         """
         button = QPushButton(button_name)
         button.setFixedSize(QSize(width, height))
-        layout.addWidget(button, row, col)
+        v_box.addWidget(button)
         return button
 
     def create_annotation(self) -> None:
@@ -101,6 +108,8 @@ class MainWindow(QMainWindow):
         :return: Нет возвращаемого значения.
         """
         when_dir = QFileDialog.getExistingDirectory(self, 'Введите путь к папке, в которой будет создана аннотация')
+        if not when_dir:
+            return
         for cls in CLASSES:
             an = Annotation(os.path.join(self.dataset_path, cls), when_dir)
             an.add_from_old_annotation()
@@ -114,6 +123,8 @@ class MainWindow(QMainWindow):
         :return: Нет возвращаемого значения.
         """
         when_dir = QFileDialog.getExistingDirectory(self, 'Введите путь к папке, в которую будет скопирован датасет')
+        if not when_dir:
+            return
         for cls in CLASSES:
             copy_dataset(os.path.join(self.dataset_path, cls), when_dir)
 
@@ -126,6 +137,8 @@ class MainWindow(QMainWindow):
         :return: Нет возвращаемого значения.
         """
         when_dir = QFileDialog.getExistingDirectory(self, 'Введите путь к папке, в которую будет скопирован датасет')
+        if not when_dir:
+            return
         for cls in CLASSES:
             copy_dataset(os.path.join(self.dataset_path, cls), when_dir)
         random_dataset(when_dir)
