@@ -17,11 +17,7 @@ class MainWindow(QMainWindow):
     Класс реализует графический интерфейс для работы с функциями из 2 лабораторной.
     """
     dataset_path: str
-    next_tiger_button: QPushButton
-    next_leopard_button: QPushButton
     label_image: QLabel
-    cur_tiger: InstanceIterator
-    cur_leopard: InstanceIterator
 
     def __init__(self):
         """
@@ -42,26 +38,11 @@ class MainWindow(QMainWindow):
         src = QLabel(f'Исходный датасет:\n{self.dataset_path}', self)
         layout = QGridLayout()
         layout.addWidget(src, 0, 0)
-        create_annotation_button = QPushButton("Сформировать аннотацию")
-        create_annotation_button.setFixedSize(QSize(250, 50))
-        create_annotation_button.clicked.connect(self.create_annotation)
-        layout.addWidget(create_annotation_button, 1, 0)
-        copy_dataset_button = QPushButton("Скопировать датасет")
-        copy_dataset_button.setFixedSize(QSize(250, 50))
-        copy_dataset_button.clicked.connect(self.dataset_copy)
-        layout.addWidget(copy_dataset_button, 2, 0)
-        copy_random_dataset_button = QPushButton("Рандомизировать датасет")
-        copy_random_dataset_button.setFixedSize(QSize(250, 50))
-        copy_random_dataset_button.clicked.connect(self.dataset_random)
-        layout.addWidget(copy_random_dataset_button, 3, 0)
-        self.next_tiger_button = QPushButton("Следующий тигр")
-        self.next_tiger_button.setFixedSize(QSize(250, 50))
-        self.next_tiger_button.clicked.connect(self.next_tiger)
-        layout.addWidget(self.next_tiger_button, 4, 0)
-        self.next_leopard_button = QPushButton("Следующий леопард")
-        self.next_leopard_button.setFixedSize(QSize(250, 50))
-        self.next_leopard_button.clicked.connect(self.next_leopard)
-        layout.addWidget(self.next_leopard_button, 5, 0)
+        create_annotation_button = self.new_button(layout, "Сформировать аннотацию", 250, 50, 1, 0)
+        copy_dataset_button = self.new_button(layout, "Скопировать датасет", 250, 50, 2, 0)
+        copy_random_dataset_button = self.new_button(layout, "Рандомизировать датасет", 250, 50, 3, 0)
+        next_tiger_button = self.new_button(layout, "Следующий тигр", 250, 50, 4, 0)
+        next_leopard_button = self.new_button(layout, "Следующий леопард", 250, 50, 5, 0)
         self.label_image = QLabel('Нажмите кнопку "Следующий тигр" или "Следующий леопард".')
         self.label_image.setMinimumSize(QSize(500, 300))
         self.label_image.setAlignment(Qt.AlignmentFlag.AlignCenter)
@@ -71,19 +52,46 @@ class MainWindow(QMainWindow):
             create_annotation_button.setEnabled(False)
             copy_dataset_button.setEnabled(False)
             copy_random_dataset_button.setEnabled(False)
-            self.next_tiger_button.setEnabled(False)
-            self.next_leopard_button.setEnabled(False)
+            next_tiger_button.setEnabled(False)
+            next_leopard_button.setEnabled(False)
             self.label_image.setText('Ошибка!\n'
                                      'В исходном датасете отсутствует одна из папок классов: "tiger" или "leopard."')
         else:
             an = Annotation(os.path.join(self.dataset_path, CLASSES[0]))
-            self.cur_tiger = InstanceIterator(an.first_instance()[1])
+            cur_tiger = InstanceIterator(an.first_instance()[1])
             an = Annotation(os.path.join(self.dataset_path, CLASSES[1]))
-            self.cur_leopard = InstanceIterator(an.first_instance()[1])
+            cur_leopard = InstanceIterator(an.first_instance()[1])
+            next_tiger_button.clicked.connect(lambda cur_inst=cur_tiger, button=next_tiger_button,
+                                              class_mark=CLASSES[0]:
+                                              self.next_instance(cur_tiger, next_tiger_button, CLASSES[0]))
+            next_leopard_button.clicked.connect((lambda cur_inst=cur_tiger, button=next_leopard_button,
+                                                 class_mark=CLASSES[0]:
+                                                 self.next_instance(cur_leopard, next_leopard_button, CLASSES[1])))
+        create_annotation_button.clicked.connect(self.create_annotation)
+        copy_dataset_button.clicked.connect(self.dataset_copy)
+        copy_random_dataset_button.clicked.connect(self.dataset_random)
         central_widget = QWidget()
         central_widget.setLayout(layout)
         self.setCentralWidget(central_widget)
         self.show()
+
+    @staticmethod
+    def new_button(layout: QGridLayout, button_name: str, width: int, height: int, row: int, col: int) -> QPushButton:
+        """
+        Функция создаёт кнопу с заданной шириной и высотой, размещая её в сетке.
+
+        :param layout: Сетка, в которой размещается кнопка.
+        :param button_name: Текстовое содержимое кнопки.
+        :param width: Ширина кнопки.
+        :param height: Высота кнопки.
+        :param row: Строка, в которой находится кнопка.
+        :param col: Столбец, в которой находится кнопка.
+        :return: Нет возвращаемого значения.
+        """
+        button = QPushButton(button_name)
+        button.setFixedSize(QSize(width, height))
+        layout.addWidget(button, row, col)
+        return button
 
     def create_annotation(self) -> None:
         """
@@ -122,37 +130,23 @@ class MainWindow(QMainWindow):
             copy_dataset(os.path.join(self.dataset_path, cls), when_dir)
         random_dataset(when_dir)
 
-    def next_tiger(self) -> None:
+    def next_instance(self, cur_inst: InstanceIterator, button: QPushButton, class_mark: str) -> None:
         """
-        Функция меняет текущее содержание метки Label на изображение экземпляра с классом тигр, реагируя на нажатие
-        кнопки "Следующий тигр".
+        Функция меняет текущее содержание метки Label на изображение экземпляра с классом class_mark,
+        реагируя на нажатие кнопки button.
         Если изображения закончатся - оповестит об этом.
 
+        :param cur_inst: Итератор для класса.
+        :param button: Кнопка, на нажатие которой реагирует функция.
+        :param class_mark: Метка класса.
         :return: Нет возвращаемого значения.
         """
-        self.label_image.setPixmap(QPixmap(self.cur_tiger.__iter__()))
+        self.label_image.setPixmap(QPixmap(cur_inst.__iter__()))
         try:
-            self.cur_tiger.__next__()
+            cur_inst.__next__()
         except StopIteration:
-            self.label_image.setText("Тигры закончились.")
-            self.next_tiger_button.setEnabled(False)
-        except OSError as err:
-            logging.warning(f'При работе итератора была вызвана ошибка:\n{err}')
-
-    def next_leopard(self) -> None:
-        """
-        Функция меняет текущее содержание метки Label на изображение экземпляра с классом leopard, реагируя на нажатие
-        кнопки "Следующий леопард".
-        Если изображения закончатся - оповестит об этом.
-
-        :return: Нет возвращаемого значения.
-        """
-        self.label_image.setPixmap(QPixmap(self.cur_leopard.__iter__()))
-        try:
-            self.cur_leopard.__next__()
-        except StopIteration:
-            self.label_image.setText("Леопарды закончились.")
-            self.next_leopard_button.setEnabled(False)
+            self.label_image.setText(f"Экземпляры класса {class_mark} закончились.")
+            button.setEnabled(False)
         except OSError as err:
             logging.warning(f'При работе итератора была вызвана ошибка:\n{err}')
 
