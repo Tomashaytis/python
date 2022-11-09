@@ -68,8 +68,8 @@ class MainWindow(QMainWindow):
             next_tiger_button.clicked.connect(lambda cur_inst=cur_tiger, button=next_tiger_button,
                                               class_mark=CLASSES[0]:
                                               self.next_instance(cur_tiger, next_tiger_button, CLASSES[0]))
-            next_leopard_button.clicked.connect((lambda cur_inst=cur_tiger, button=next_leopard_button,
-                                                 class_mark=CLASSES[0]:
+            next_leopard_button.clicked.connect((lambda cur_inst=cur_leopard, button=next_leopard_button,
+                                                 class_mark=CLASSES[1]:
                                                  self.next_instance(cur_leopard, next_leopard_button, CLASSES[1])))
         create_annotation_button.clicked.connect(self.create_annotation)
         copy_dataset_button.clicked.connect(self.dataset_copy)
@@ -87,7 +87,7 @@ class MainWindow(QMainWindow):
     @staticmethod
     def new_button(v_box: QVBoxLayout, button_name: str, width: int, height: int) -> QPushButton:
         """
-        Функция создаёт кнопу с заданной шириной и высотой, размещая её в сетке.
+        Функция создаёт кнопу с заданной шириной и высотой, добавляя её в столбец кнопок (v-бокс).
 
         :param v_box: V-бокс, в который добавляется кнопка.
         :param button_name: Текстовое содержимое кнопки.
