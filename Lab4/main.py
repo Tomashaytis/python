@@ -29,4 +29,4 @@ if __name__ == "__main__":
     mask = (instance_df.class_mark == 'leopard')
     instance_df['numerical_class_mark'] = mask.astype(int)
     instance_df['width'], instance_df['height'], instance_df['channels'] = image_shapes(instance_df['absolute_path'])
-    print(instance_df['width'])
+    print(instance_df.describe())
