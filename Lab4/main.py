@@ -34,6 +34,21 @@ def class_mark_filter(df: pd.DataFrame, class_mark: str) -> pd.DataFrame:
     return df[df.class_mark == class_mark]
 
 
+def multi_filter(df: pd.DataFrame, max_width: int, max_height: int, class_mark: str) -> pd.DataFrame:
+    """
+    Функция возвращает отфильтрованный по метке класса, максимальной высоте и ширине изображения датафрейм.
+    Результатом будет датафрейм, состоящий из изображений, удовлетворяющих условиям:
+    width <= max_width, height <= max_height, и метка класса соответствует заданной.
+
+    :param df: датафрейм, который требуется отфильтровать.
+    :param max_width: Максимальная ширина изображения.
+    :param max_height: Максимальная высота изображения.
+    :param class_mark: Метка класса, по которой производится фильтрация.
+    :return: Отфильтрованный датафрейм.
+    """
+    return df[((df.class_mark == class_mark) & (df.width <= max_width) & (df.height <= max_height))]
+
+
 if __name__ == "__main__":
     instance_df = pd.read_csv('annotation.csv')
     instance_df.drop(['relative path'], axis=1, inplace=True)
@@ -41,5 +56,5 @@ if __name__ == "__main__":
     mask = (instance_df.class_mark == CLASSES[1])
     instance_df['numerical_class_mark'] = mask.astype(int)
     instance_df['width'], instance_df['height'], instance_df['channels'] = image_shapes(instance_df['absolute_path'])
-    filter_df = class_mark_filter(instance_df, CLASSES[1])
-    print(filter_df)
+    filter_df = multi_filter(instance_df, 480, 319, CLASSES[1])
+    print(filter_df['class_mark'])
