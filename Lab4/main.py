@@ -1,5 +1,6 @@
 import pandas as pd
 import numpy as np
+import matplotlib.pyplot as plt
 import cv2
 CLASSES = ["tiger", "leopard"]
 
@@ -62,14 +63,14 @@ def grouper(df: pd.DataFrame) -> tuple:
     return df.groupby('class_mark').max(), df.groupby('class_mark').min(), df.groupby('class_mark').mean()
 
 
-def histograms(df: pd.DataFrame, class_mark: str) -> tuple:
+def histograms(df: pd.DataFrame, class_mark: str) -> list:
     """
     Функция возвращает гистограммы по 3 каналам изображения, выбранного случайно из изображений,
     отфильтрованных по метке класса.
 
-    :param df: Датафрейм, по изображению из которого будет строиться гистограмма.
+    :param df: Датафрейм, по изображению из которого будет строиться гистограммы.
     :param class_mark: Метка класса, по которой фильтруется датафрейм.
-    :return: Кортеж из 3 списков (гистограмм).
+    :return: Список из 3 списков (гистограмм).
     """
     df = class_mark_filter(df, class_mark)
     image_paths = df.absolute_path.to_numpy()
@@ -79,7 +80,27 @@ def histograms(df: pd.DataFrame, class_mark: str) -> tuple:
     hist0 = cv2.calcHist([image], [0], None, [256], [0, 256])
     hist1 = cv2.calcHist([image], [1], None, [256], [0, 256])
     hist2 = cv2.calcHist([image], [2], None, [256], [0, 256])
-    return hist0, hist1, hist2
+    return [hist0, hist1, hist2]
+
+
+def draw_hists(df: pd.DataFrame, class_mark: str) -> None:
+    """
+    Функция отрисовывает гистограммы по 3 каналам случайного изображения из датафрейма.
+    Для получения гистограмм используется функция histograms.
+
+    :param df: Датафрейм, по изображению из которого будет отрисовываться гистограммы.
+    :param class_mark: Метка класса, по которой фильтруется датафрейм.
+    :return: Нет возвращаемого значения.
+    """
+    hists = histograms(df, class_mark)
+    color = ['r', 'g', 'b']
+    for i in range(3):
+        plt.plot(hists[i], color=color[i])
+    plt.title('Распределение цветов')
+    plt.ylabel('интенсивность')
+    plt.xlabel('цвет пикселей')
+    plt.xlim([0, 256])
+    plt.show()
 
 
 if __name__ == "__main__":
@@ -89,6 +110,7 @@ if __name__ == "__main__":
     mask = (instance_df.class_mark == CLASSES[1])
     instance_df['numerical_class_mark'] = mask.astype(int)
     instance_df['width'], instance_df['height'], instance_df['channels'] = image_shapes(instance_df['absolute_path'])
-    h0, h1, h2 = histograms(instance_df, CLASSES[0])
-    print(h1)
+    draw_hists(instance_df, CLASSES[1])
+
+
 
