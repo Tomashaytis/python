@@ -110,7 +110,4 @@ if __name__ == "__main__":
     mask = (instance_df.class_mark == CLASSES[1])
     instance_df['numerical_class_mark'] = mask.astype(int)
     instance_df['width'], instance_df['height'], instance_df['channels'] = image_shapes(instance_df['absolute_path'])
-    draw_hists(instance_df, CLASSES[1])
-
-
-
+    instance_df.to_csv('properties.csv')
