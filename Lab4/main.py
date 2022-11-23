@@ -1,4 +1,5 @@
 import pandas as pd
+import numpy as np
 import cv2
 CLASSES = ["tiger", "leopard"]
 
@@ -61,6 +62,26 @@ def grouper(df: pd.DataFrame) -> tuple:
     return df.groupby('class_mark').max(), df.groupby('class_mark').min(), df.groupby('class_mark').mean()
 
 
+def histograms(df: pd.DataFrame, class_mark: str) -> tuple:
+    """
+    Функция возвращает гистограммы по 3 каналам изображения, выбранного случайно из изображений,
+    отфильтрованных по метке класса.
+
+    :param df: Датафрейм, по изображению из которого будет строиться гистограмма.
+    :param class_mark: Метка класса, по которой фильтруется датафрейм.
+    :return: Кортеж из 3 списков (гистограмм).
+    """
+    df = class_mark_filter(df, class_mark)
+    image_paths = df.absolute_path.to_numpy()
+    image_path = np.random.choice(image_paths)
+    image = cv2.imread(image_path)
+    image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+    hist0 = cv2.calcHist([image], [0], None, [256], [0, 256])
+    hist1 = cv2.calcHist([image], [1], None, [256], [0, 256])
+    hist2 = cv2.calcHist([image], [2], None, [256], [0, 256])
+    return hist0, hist1, hist2
+
+
 if __name__ == "__main__":
     instance_df = pd.read_csv('annotation.csv')
     instance_df.drop(['relative path'], axis=1, inplace=True)
@@ -68,5 +89,6 @@ if __name__ == "__main__":
     mask = (instance_df.class_mark == CLASSES[1])
     instance_df['numerical_class_mark'] = mask.astype(int)
     instance_df['width'], instance_df['height'], instance_df['channels'] = image_shapes(instance_df['absolute_path'])
-    group_df_max, group_df_min, group_df_mean = grouper(instance_df)
-    print(group_df_mean)
+    h0, h1, h2 = histograms(instance_df, CLASSES[0])
+    print(h1)
+
