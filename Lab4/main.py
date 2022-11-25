@@ -59,13 +59,13 @@ def grouper(df: pd.DataFrame) -> tuple:
     :param df: Датафрейм, по которому строятся группировки.
     :return: Кортеж из 3 группировок: максимальное, минимальное и среднее количество пикселей изображения.
     """
-    df['pixels'] = df['width'] * df['height'] * df['channels']
+    df['pixels'] = df['width'] * df['height']
     return df.groupby('class_mark').max(), df.groupby('class_mark').min(), df.groupby('class_mark').mean()
 
 
 def histograms(df: pd.DataFrame, class_mark: str) -> list:
     """
-    Функция возвращает гистограммы по 3 каналам изображения, выбранного случайно из изображений,
+    Функция возвращает нормированные гистограммы по 3 каналам изображения, выбранного случайно из изображений,
     отфильтрованных по метке класса.
 
     :param df: Датафрейм, по изображению из которого будет строиться гистограммы.
@@ -76,10 +76,10 @@ def histograms(df: pd.DataFrame, class_mark: str) -> list:
     image_paths = df.absolute_path.to_numpy()
     image_path = np.random.choice(image_paths)
     image = cv2.imread(image_path)
-    image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
-    hist0 = cv2.calcHist([image], [0], None, [256], [0, 256])
-    hist1 = cv2.calcHist([image], [1], None, [256], [0, 256])
-    hist2 = cv2.calcHist([image], [2], None, [256], [0, 256])
+    img_height, img_width, img_channels = image.shape
+    hist0 = cv2.calcHist([image], [0], None, [256], [0, 256]) / (img_height * img_width)
+    hist1 = cv2.calcHist([image], [1], None, [256], [0, 256]) / (img_height * img_width)
+    hist2 = cv2.calcHist([image], [2], None, [256], [0, 256]) / (img_height * img_width)
     return [hist0, hist1, hist2]
 
 
@@ -93,12 +93,12 @@ def draw_hists(df: pd.DataFrame, class_mark: str) -> None:
     :return: Нет возвращаемого значения.
     """
     hists = histograms(df, class_mark)
-    color = ['r', 'g', 'b']
+    color = ['b', 'g', 'r']
     for i in range(3):
         plt.plot(hists[i], color=color[i])
-    plt.title('Распределение цветов')
-    plt.ylabel('интенсивность')
-    plt.xlabel('цвет пикселей')
+    plt.title('Гистограмма изображения')
+    plt.ylabel('Плотность пикселей')
+    plt.xlabel('Яркость оттенков')
     plt.xlim([0, 256])
     plt.show()
 
@@ -110,4 +110,5 @@ if __name__ == "__main__":
     mask = (instance_df.class_mark == CLASSES[1])
     instance_df['numerical_class_mark'] = mask.astype(int)
     instance_df['width'], instance_df['height'], instance_df['channels'] = image_shapes(instance_df['absolute_path'])
-    instance_df.to_csv('properties.csv')
+    draw_hists(instance_df, 'tiger')
+    # instance_df.to_csv('properties.csv')
