@@ -1,13 +1,12 @@
 import torch
 import torch.nn as nn
 import torch.optim as optim
-import torch.nn.functional as F
-from torchvision import datasets, models, transforms
+from torchvision import transforms
 from torch.utils.data import DataLoader, Dataset
-import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 import os
+from random import randint
 import glob
 from PIL import Image
 from sklearn.model_selection import train_test_split
@@ -119,6 +118,10 @@ if __name__ == '__main__':
     # Деление на тренировочные, тестовые и валидационные данные
     x_train, x_test_val, y_train, y_test_val = train_test_split(dataset_list, class_marks, test_size=0.2, shuffle=True)
     x_test, x_val, y_test, y_val = train_test_split(x_test_val, y_test_val, test_size=0.5)
+    # Проверка выборок на сбалансированность
+    print(sum(y_train == 1), sum(y_train == 0))
+    print(sum(y_test == 1), sum(y_test == 0))
+    print(sum(y_val == 1), sum(y_val == 0))
     # Аугментации
     custom_transforms = transforms.Compose([transforms.ToTensor(),
                                             transforms.Resize((224, 224)),
@@ -129,12 +132,11 @@ if __name__ == '__main__':
     predator_train = PredatorDataset(x_train, y_train, custom_transforms)
     predator_test = PredatorDataset(x_test, y_test, custom_transforms)
     predator_val = PredatorDataset(x_val, y_val, custom_transforms)
-    # print(len(predator_train), len(predator_test), len(predator_val))
     # Инициализация модели и основных параметров
     model = AlexNet(num_classes=2).to(device)
-    bach_size = 10
+    bach_size = 100
     lr = 0.005
-    epochs = 20
+    epochs = 17
     accuracy_values = []
     loss_values = []
     accuracy_values_val = []
@@ -146,7 +148,7 @@ if __name__ == '__main__':
     criterion = nn.CrossEntropyLoss()
     optimizer = optim.SGD(model.parameters(), lr=lr, weight_decay=0.005, momentum=0.9)
     # основной цикл
-    model.train()
+    '''model.train()
     for epoch in range(epochs):
         epoch_loss = 0
         total = 0
@@ -197,6 +199,39 @@ if __name__ == '__main__':
             loss_values_val.append(val_loss)
             print('VALID: Epoch : {}, valid accuracy : {}, valid loss : {}'.format(epoch + 1, correct / total, val_loss))
     # Сохранил модель и графики
-    torch.save(model.state_dict(), 'model.pt')
-    analysis_accuracy(accuracy_values, accuracy_values_val)
-    analysis_loss(loss_values, loss_values_val)
+    # torch.save(model.state_dict(), 'model.pt')
+    # analysis_accuracy(accuracy_values, accuracy_values_val)
+    # analysis_loss(loss_values, loss_values_val)'''
+    # Загрузка модели
+    new_model = AlexNet(num_classes=2).to(device)
+    new_model.load_state_dict(torch.load("alexnet.pt"))
+    # Тест модели на тренировочных данных и визуализация её работы
+    new_model.eval()
+    test_loss = 0
+    total = 0
+    correct = 0
+    first = True
+    for data, label in test_dataloader:
+        if len(label) < bach_size:
+            break
+        data = data.to(device)
+        label = label.to(device)
+        output = new_model(data)
+
+        loss = criterion(output, label)
+
+        _, predicted = torch.max(output.data, 1)
+        total += label.size(0)
+        correct += (predicted == label).sum().item()
+        test_loss += loss / len(test_dataloader)
+        predicted = predicted.numpy()
+        if first:
+            plt.figure()
+            for i in range(21):
+                plt.subplot(3, 7, i + 1)
+                plt.title("leopard" if predicted[i] == 0 else "tiger")
+                plt.imshow(data[i].permute(1, 2, 0).numpy()[:, :, ::-1])
+            plt.show()
+            first = False
+        del data, label, output
+    print('TEST: test accuracy: {}, test loss: {}'.format(correct / total, float(test_loss)))
